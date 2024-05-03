@@ -1,42 +1,63 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-
-/**
- *
- * @author Adm
- */
-
 import java.sql.PreparedStatement;
-import java.sql.Connection;
 import javax.swing.JOptionPane;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class ProdutosDAO {
     
-    Connection conn;
-    PreparedStatement prep;
-    ResultSet resultset;
-    ArrayList<ProdutosDTO> listagem = new ArrayList<>();
-    
-    public void cadastrarProduto (ProdutosDTO produto){
+    public List<ProdutosDTO> listarProdutos() throws SQLException{
         
-        
-        //conn = new conectaDAO().connectDB();
-        
-        
+        conectaDAO conecta = new conectaDAO();
+        conecta.conectar();
+
+        List lista = new ArrayList();
+            
+            String sql = "SELECT*FROM produtos;";
+            
+            
+            PreparedStatement query = conecta.getConexao().prepareStatement(sql);
+            
+            ResultSet recebe = query.executeQuery();
+            
+                    while(recebe.next()){
+                        ProdutosDTO p = new ProdutosDTO();
+                        p.setNome(recebe.getString("nome"));
+                        p.setStatus(recebe.getString("status"));
+                        p.setValor(recebe.getInt("valor"));
+                        lista.add(p);
+                        
+                        
+                    }
+            
+            conecta.desconectar();
+            return lista;
+}
+
+    public boolean cadastrar (ProdutosDTO p) {
+        try{
+            conectaDAO conecta = new conectaDAO();
+            conecta.conectar();
+            
+            String sql = "INSERT INTO produtos (nome,valor,status) values (?,?,?);";
+            
+            PreparedStatement query = conecta.getConexao().prepareStatement(sql);
+            
+            query.setString(1, p.getNome());
+            query.setInt(2, p.getValor());
+            query.setString(3, p.getStatus());
+            
+            query.execute();
+            
+            conecta.desconectar();
+            JOptionPane.showMessageDialog(null, "Produto cadastrado!");
+            return true;
+        } catch (SQLException se){
+            JOptionPane.showMessageDialog(null, "Erro ao registrar os valores");
+            return false;
+        }
     }
-    
-    public ArrayList<ProdutosDTO> listarProdutos(){
-        
-        return listagem;
-    }
-    
-    
-    
-        
 }
 
