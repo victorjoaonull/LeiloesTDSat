@@ -24,6 +24,7 @@ public class ProdutosDAO {
             
                     while(recebe.next()){
                         ProdutosDTO p = new ProdutosDTO();
+                        p.setId(recebe.getInt("id"));
                         p.setNome(recebe.getString("nome"));
                         p.setStatus(recebe.getString("status"));
                         p.setValor(recebe.getInt("valor"));
@@ -53,6 +54,27 @@ public class ProdutosDAO {
             
             conecta.desconectar();
             JOptionPane.showMessageDialog(null, "Produto cadastrado!");
+            return true;
+        } catch (SQLException se){
+            JOptionPane.showMessageDialog(null, "Erro ao registrar os valores");
+            return false;
+        }
+    }
+    public boolean venderProduto (int id) {
+        try{
+            conectaDAO conecta = new conectaDAO();
+            conecta.conectar();
+            
+            String sql = "UPDATE produtos SET status = 'Vendido' WHERE id=?;";
+            
+            PreparedStatement query = conecta.getConexao().prepareStatement(sql);
+            
+            query.setInt(1, id);
+            
+            query.execute();
+            
+            conecta.desconectar();
+            JOptionPane.showMessageDialog(null, "Produto vendido!");
             return true;
         } catch (SQLException se){
             JOptionPane.showMessageDialog(null, "Erro ao registrar os valores");
